@@ -161,7 +161,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--line', action='store_true', help='Read maze line by line from stdin')
     parser.add_argument('-f', '--file', type=str, help='Read maze from a file')
-    parser.add_argument('-a', '--algorithm', type=str, choices=['bfs', 'a_star_0', 'a_star_1'], default='a_star_1', help='Choose the algorithm to run')
+    parser.add_argument('-a', '--algorithm', type=str, choices=['BFS', 'A*(h=0)', 'A*'], default='a_star_1', help='Choose the algorithm to run')
     args = parser.parse_args()
 
     if args.line:
@@ -172,11 +172,26 @@ if __name__ == "__main__":
         print("Please specify an input method: --line or --file <filename>")
         sys.exit(1)
     
-    if args.algorithm == 'bfs':
+    if args.algorithm == 'BFS':
         result = BFS(maze, start, end, rows, cols)
-    elif args.algorithm == 'a_star_0':
+    elif args.algorithm == 'A*(h=0)':
         result = a_star_0(maze, start, end, rows, cols)
-    elif args.algorithm == 'a_star_1':
+    elif args.algorithm == 'A*':
         result = a_star_1(maze, start, end, rows, cols)
 
-    print(f"{args.algorithm.upper()}: {result}")
+    if result['path_exist']:
+        output = f"""
+        [{args.algorithm}] 
+            Path Exist: Yes
+            Length: {result['length']}
+            Expanded States: {result['expanded_states']}
+            Time: {result['elapsed_time']} ms"""
+    else:
+        output = f"""
+        [{args.algorithm}] 
+            Path Exist: No
+            Length: -1
+            Expanded States: {result['expanded_states']}
+            Time: {result['elapsed_time']} ms"""
+
+    print(output)
