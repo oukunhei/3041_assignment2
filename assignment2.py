@@ -7,11 +7,16 @@ from pathlib import Path
 import time
 import argparse
 from collections import deque
+import math
 
 DIRECTIONS = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
-# bfs算法步骤：1初始化队列（加入起点）2从头部取出元素 3判断是否end，end则在parent里面统计长度 4不是end将可行邻居添加到队列
-# 如果parent长度等于矩阵大小则说明没有路径
+# bfs algorithm steps：
+# 1 initialize the queue (add start node), use dqueue for better performance
+# 2 pop an element from head 
+# 3 decide if it is the end point, if yes then find its path in visited 
+# 4 if not end node then add its neighbors to the queue
+# if no path, end when there's no element in the queue
 def get_neighbors(pos: Tuple[int, int], maze: List[List[str]], rows: int, cols: int) -> List[Tuple[int, int]]:
     neighbors = []
     directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # 右、左、下、上
@@ -59,24 +64,30 @@ def BFS(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int], row
     return {"algorithm": "BFS", "path_exist": path_exist, "length": length, "expanded_states": expanded_states, "elapsed_time": elapsed_time}
 
 
-# A* algorithm: 1初始化堆（g，node）由于h=0且步长都是1所以等价宽搜 2从堆中取出元素 3判断是否end 4将邻居添加到堆
+# A* algorithm
+# 1 initialize heap (g，node) 
+# 2 get an element from the heap (the one with smallest f)
+# 3 if end, find its path in CLOSED
+# 4 if not end, add its neighbors to the heap with f=g+h
 def a_star_0(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int], rows: int, cols: int):
     path_exist = False
     OPEN = []
-    heapq.heappush(OPEN, (0, start))
-    CLOSED = {}
+    heapq.heappush(OPEN, (0, start)) # since h=0, we have f = g
+    CLOSED = {start: 0} # store g value for each node in CLOSED
     start_time = time.perf_counter()
 
     while OPEN:
         g, current = heapq.heappop(OPEN)
-        CLOSED[current] = g
         if current == end:
             path_exist = True
             break
 
         for neighbor in get_neighbors(current, maze, rows, cols):
             if neighbor not in CLOSED:
-                heapq.heappush(OPEN, (g + 1, neighbor))
+                CLOSED[neighbor] = g + 1
+                heapq.heappush(OPEN, (g + 1, neighbor)) 
+            # we don't need to update g for nodes in CLOSED since every step is 1
+            # we won't find a shorter path to a node in CLOSED after we add it to CLOSED
     end_time = time.perf_counter()
     elapsed_time = round((end_time - start_time) * 1000, 4)
     if path_exist:
@@ -89,8 +100,9 @@ def a_star_0(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int]
     
 
 def heuristic(pos: Tuple[int, int], end: Tuple[int, int]) -> float:
-    h = abs(pos[0] - end[0]) + abs(pos[1] - end[1])
-    return h
+    x_distance = pos[0] - end[0]
+    y_distance = pos[1] - end[1]
+    return math.sqrt(x_distance ** 2 + y_distance ** 2)
 
 
 def a_star_1(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int], rows: int, cols: int):
@@ -98,12 +110,11 @@ def a_star_1(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int]
     OPEN = []
     h_start = heuristic(start, end)
     heapq.heappush(OPEN, (h_start, 0, start))
-    CLOSED = {}
+    CLOSED = {start: 0}
     start_time = time.perf_counter()
 
     while OPEN:
         f, g, current = heapq.heappop(OPEN)
-        CLOSED[current] = g
         if current == end:
             path_exist = True
             break
@@ -111,7 +122,10 @@ def a_star_1(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int]
         for neighbor in get_neighbors(current, maze, rows, cols):
             if neighbor not in CLOSED:
                 h_neighbor = heuristic(neighbor, end)
+                CLOSED[neighbor] = g + 1
                 heapq.heappush(OPEN, (g + 1 + h_neighbor, g + 1, neighbor))
+            # we don't need to update g for nodes in CLOSED since every step is 1
+            # we won't find a shorter path to a node in CLOSED after we add it to CLOSED
     end_time = time.perf_counter()
     elapsed_time = round((end_time - start_time) * 1000, 4)
     if path_exist:
