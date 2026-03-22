@@ -162,7 +162,7 @@ def read_maze_from_file(filename):
             row = list(line)
             maze.append(row)
             
-            # 查找起点和终点
+            # find start and end positions
             for j, cell in enumerate(row):
                 if cell == 'S':
                     start = (i, j)
