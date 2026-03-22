@@ -16,8 +16,8 @@ This program supports **two input methods**:
 It also supports selecting an algorithm:
 
 - `--algorithm BFS`
-- `--algorithm A*(h=0)`
-- `--algorithm A*` (default)
+- `--algorithm astar0` (A* with heuristic function h=0)
+- `--algorithm astar` (A* algorithm, default)
 
 ### Option A: paste input (recommended when submitting only .py/.md)
 
@@ -26,7 +26,7 @@ When using stdin mode and paste the maze directly:
 PowerShell (Windows):
 
 ```powershell
-python .\assignment2.py --line --algorithm A*
+python .\assignment2.py -l --algorithm astar
 ```
 
 Then paste input in this format (see **Input format** below), and press `Enter` to end input.
@@ -37,17 +37,17 @@ If you do have an input file, you can run:
 
 ```powershell
 # Run from the folder containing assignment2.py
-python .\assignment2.py --file .\maze1.in --algorithm BFS
+python .\assignment2.py -f .\maze1.in --algorithm BFS
 
 # Or provide an absolute path if the input file is elsewhere
-python .\assignment2.py --file "C:\\path\\to\\maze.in" --algorithm A*
+python .\assignment2.py --file "C:\\path\\to\\maze.in" --algorithm astar
 ```
 
 #### Important note about paths
 
 - To avoid path issues, either:
-	- use **stdin mode** (`--line`) and paste the test case, or
-	- place the input file in the **same directory** as `assignment2.py` and run with `--file .\\your_maze.in`, or
+	- use **stdin mode** (`-l`) and paste the test case, or
+	- place the input file in the **same directory** as `assignment2.py` and run with `-f .\\your_maze.in`, or
 	- pass the input file’s **absolute path**.
 
 ## Input format
