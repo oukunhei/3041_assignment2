@@ -56,7 +56,7 @@ def BFS(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int], row
 
     expanded_states = len(visited)
 
-    return {"path_exist": path_exist, "length": length, "expanded_states": expanded_states, "elapsed_time": elapsed_time}
+    return {"algorithm": "BFS", "path_exist": path_exist, "length": length, "expanded_states": expanded_states, "elapsed_time": elapsed_time}
 
 
 # A* algorithm: 1初始化堆（g，node）由于h=0且步长都是1所以等价宽搜 2从堆中取出元素 3判断是否end 4将邻居添加到堆
@@ -84,7 +84,7 @@ def a_star_0(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int]
     else:
         length = -1
     expanded_states = len(CLOSED)
-    return {"path_exist": path_exist, "length": length, "expanded_states": expanded_states, "elapsed_time": elapsed_time}
+    return {"algorithm": "A* (h=0)", "path_exist": path_exist, "length": length, "expanded_states": expanded_states, "elapsed_time": elapsed_time}
 
     
 
@@ -119,7 +119,7 @@ def a_star_1(maze: List[List[str]], start: Tuple[int, int], end: Tuple[int, int]
     else:
         length = -1
     expanded_states = len(CLOSED)
-    return {"path_exist": path_exist, "length": length, "expanded_states": expanded_states, "elapsed_time": elapsed_time}
+    return {"algorithm": "A*", "path_exist": path_exist, "length": length, "expanded_states": expanded_states, "elapsed_time": elapsed_time}
 
 def read_maze_linebyline():
     n, m = map(int, sys.stdin.readline().split())
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--line', action='store_true', help='Read maze line by line from stdin')
     parser.add_argument('-f', '--file', type=str, help='Read maze from a file')
-    parser.add_argument('-a', '--algorithm', type=str, choices=['BFS', 'A*(h=0)', 'A*'], default='a_star_1', help='Choose the algorithm to run')
+    parser.add_argument('-a', '--algorithm', type=str, choices=['BFS', 'astar0', 'astar'], default='astar', help='Choose the algorithm to run')
     args = parser.parse_args()
 
     if args.line:
@@ -174,21 +174,21 @@ if __name__ == "__main__":
     
     if args.algorithm == 'BFS':
         result = BFS(maze, start, end, rows, cols)
-    elif args.algorithm == 'A*(h=0)':
+    elif args.algorithm == 'astar0':
         result = a_star_0(maze, start, end, rows, cols)
-    elif args.algorithm == 'A*':
+    elif args.algorithm == 'astar':
         result = a_star_1(maze, start, end, rows, cols)
 
     if result['path_exist']:
         output = f"""
-        [{args.algorithm}] 
+        [{result['algorithm']}] 
             Path Exist: Yes
             Length: {result['length']}
             Expanded States: {result['expanded_states']}
             Time: {result['elapsed_time']} ms"""
     else:
         output = f"""
-        [{args.algorithm}] 
+        [{result['algorithm']}] 
             Path Exist: No
             Length: -1
             Expanded States: {result['expanded_states']}
